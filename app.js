@@ -11,7 +11,6 @@ var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
 var app = express();
 
-app.use(cors());
 const dotenv = require('dotenv')
 dotenv.config({path:'./config.env'})
 
@@ -64,6 +63,7 @@ app.use(multer({
   fileFilter:fileFilter
 }).array('gambarUser',4))
 
+app.use(cors());
 app.use('/', indexRouter);
 app.use('/user',userRouter);
 
