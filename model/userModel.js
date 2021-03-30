@@ -2,38 +2,61 @@ const mongodb = require('mongoose')
 
 const Modeluser = new mongodb.Schema({
     nik:{
-        type:String
+        type:String,
+        required: true
     },
     nama:{
-        type:String
+        type:String,
+        required: true
+    },
+    email:{
+        type:String,
+        required: true
     },
     alamat:{
-        type:String
+        type:String,
+        required: true
     },
     tgllahir:{
-        type:String
+        type:String,
+        required: true
     },
     tptlahir:{
-        type:String
+        type:String,
+        required: true
     },
     kelurahan:{
-        type:String
+        type:String,
+        required: true
     },
     kecamatan:{
-        type:String
+        type:String,
+        required: true
     },
     kota:{
-        type:String
+        type:String,
+        required: true
     },
     provinsi:{
-        type:String
+        type:String,
+        required: true
     },
     password:{
-        type:String
+        type:String,
+        required: true
     },
      gambarUser:{
-        type:Array
-    }
+        type:Array,
+        required: true
+    },
+    facedescriptor:{
+        type:Array,
+        // required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now()
+      }
 })
 
 const Datauser = mongodb.model('datauser',Modeluser)

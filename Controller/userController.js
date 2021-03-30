@@ -1,11 +1,121 @@
 const Datauser = require('../model/userModel')
 const fs = require('fs')
 const path = require('path')
-
+const { check, validationResult} = require("express-validator/check");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 var bodyParser = require("body-parser");
 
+
+exports.signup = async(req,res)=>{
+    
+      try {
+        let {nik,nama,alamat,email,tgllahir,tptlahir,facedescriptor,kelurahan,kecamatan,kota,provinsi,password} = req.body
+    
+   
+    let gambarUser = []
+    req.files.forEach((data)=>{
+        gambarUser.push(data.path)
+    })
+    let user = await Datauser.findOne({
+        email
+      });
+      if (user) {
+        return res.status(400).json({
+            msg: "User Already Exists"
+        });
+    }
+    let dataSave = new Datauser({
+   nik : nik,
+   nama : nama, 
+   alamat : alamat,
+   email : email,
+   tgllahir : tgllahir,
+   tptlahir : tptlahir,
+   kelurahan : kelurahan,
+   kecamatan : kecamatan,
+   kota : kota,
+   provinsi : provinsi,
+   password : password,
+   facedescriptor : facedescriptor,
+   gambarUser:gambarUser
+    })
+    
+    const salt = await bcrypt.genSalt(10);
+    dataSave.password = await bcrypt.hash(password, salt);
+    await dataSave.save();
+    const payload = {
+        dataSave: {
+            id: dataSave.id
+        }
+    };
+
+    jwt.sign(
+        payload,
+        "randomString", {
+            expiresIn: "1d"
+        },
+        (err, token) => {
+            if (err) throw err;
+            res.status(200).json({
+                token
+            });
+        }
+    );
+    
+}catch (err) {
+            console.log(err.message);
+            res.status(500).send("Error in Saving");
+        }
+}
+
+exports.masuk =  async(req,res)=>{
+    const { email, password } = req.body;
+    try {
+        let user = await Datauser.findOne({
+          email
+        });
+        if (!user)
+          return res.status(400).json({
+            message: "User Not Exist"
+          });
+          
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch)
+          return res.status(400).json({
+            message: "Incorrect Password !"
+          });
+  
+          const payload = {
+           user: {
+            id: user.id
+          }
+        };
+  
+        jwt.sign(
+          payload,
+          "randomString",
+          {
+            expiresIn: 3600
+          },
+          (err, token) => {
+            if (err) throw err;
+            res.status(200).json({
+              token
+            });
+          }
+        );
+      } catch (e) {
+        console.error(e);
+        res.status(500).json({
+          message: "Server Error"
+        });
+      }
+}
+
+
 exports.insertuser = (req,res)=>{
-    let {nik,nama,alamat,tgllahir,tptlahir,kelurahan,kecamatan,kota,provinsi,password} = req.body
+    let {nik,nama,alamat,email,tgllahir,tptlahir,kelurahan,kecamatan,kota,provinsi,password} = req.body
     let gambarUser = []
     req.files.forEach((data)=>{
         gambarUser.push(data.path)
@@ -14,6 +124,7 @@ exports.insertuser = (req,res)=>{
    nik : nik,
    nama : nama, 
    alamat : alamat,
+   email : email,
    tgllahir : tgllahir,
    tptlahir : tptlahir,
    kelurahan : kelurahan,
@@ -40,10 +151,12 @@ exports.getuser = (req,res)=>{
             res.status(200).json({
                 message:"Berhasil mendapatkan semua datanya!",
                 data: doc
+                
             })
         }else{
             res.status(400).send("Gagal mendapatkan Data ERR : "+err)
         }
+
     })
     
 }
@@ -151,5 +264,21 @@ exports.getUserByNik = (req, res,next) => {
   })
   };
 
+  
+exports.getUserlogin = (req, res,next) => {
+    // let nik = req.params.nik;
+    let {nik,password} = req.body
+    Datauser.find({nik:{$regex:nik,$options:'i'}}).exec((err,doc)=>{
+      if(!err){
+          res.status(200).json({
+              message:"Berhasil mendapatkan buah dengan rasa "+nik,
+              data:doc
+          })
+      }
+      else{
+          res.status(400).send("Gagal mendapatkan buah" + err)
+      }
+  })
+  };
   
   
