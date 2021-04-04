@@ -10,7 +10,7 @@ var bodyParser = require("body-parser");
 exports.signup = async(req,res)=>{
     
       try {
-        let {nik,nama,alamat,email,tgllahir,tptlahir,facedescriptor,kelurahan,kecamatan,kota,provinsi,password,password2} = req.body
+        let {nik,nama,alamat,email,tgllahir,tptlahir,facedescriptor,kelurahan,kecamatan,kota,provinsi,password} = req.body
         // if(newuser.password!=newuser.password2)return res.status(400).json({message: "password not match"});
    
     let gambarUser = []
