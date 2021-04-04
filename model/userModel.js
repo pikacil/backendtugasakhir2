@@ -44,9 +44,10 @@ const Modeluser = new mongodb.Schema({
     password:{
         type:String,
         required: true
-    },password2:{
-        type:String,
     },
+//     password2:{
+//         type:String,
+//     },
      gambarUser:{
         type:Array,
         required: true
