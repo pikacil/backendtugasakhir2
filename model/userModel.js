@@ -44,6 +44,8 @@ const Modeluser = new mongodb.Schema({
     password:{
         type:String,
         required: true
+    },password2:{
+        type:String,
     },
      gambarUser:{
         type:Array,
@@ -53,6 +55,7 @@ const Modeluser = new mongodb.Schema({
         type:Array,
         // required: true
     },
+   
     createdAt: {
         type: Date,
         default: Date.now()

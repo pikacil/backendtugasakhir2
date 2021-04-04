@@ -10,21 +10,21 @@ var bodyParser = require("body-parser");
 exports.signup = async(req,res)=>{
     
       try {
-        let {nik,nama,alamat,email,tgllahir,tptlahir,facedescriptor,kelurahan,kecamatan,kota,provinsi,password} = req.body
-    
+        let {nik,nama,alamat,email,tgllahir,tptlahir,facedescriptor,kelurahan,kecamatan,kota,provinsi,password,password2} = req.body
+        // if(newuser.password!=newuser.password2)return res.status(400).json({message: "password not match"});
    
     let gambarUser = []
     req.files.forEach((data)=>{
         gambarUser.push(data.path)
     })
-    let user = await Datauser.findOne({
-        email
-      });
-      if (user) {
-        return res.status(400).json({
-            msg: "User Already Exists"
-        });
-    }
+    // let user = await Datauser.findOne({
+    //     email
+    //   });
+    //   if (user) {
+    //     return res.status(400).json({
+    //         msg: "User Already Exists"
+    //     });
+    // }
     let dataSave = new Datauser({
    nik : nik,
    nama : nama, 
@@ -38,7 +38,8 @@ exports.signup = async(req,res)=>{
    provinsi : provinsi,
    password : password,
    facedescriptor : facedescriptor,
-   gambarUser:gambarUser
+   gambarUser:gambarUser,
+
     })
     
     const salt = await bcrypt.genSalt(10);
@@ -58,7 +59,8 @@ exports.signup = async(req,res)=>{
         (err, token) => {
             if (err) throw err;
             res.status(200).json({
-                token
+                token,
+                user : dataSave
             });
         }
     );
@@ -101,7 +103,8 @@ exports.masuk =  async(req,res)=>{
           (err, token) => {
             if (err) throw err;
             res.status(200).json({
-              token
+              token,
+              user : user
             });
           }
         );
@@ -113,37 +116,6 @@ exports.masuk =  async(req,res)=>{
       }
 }
 
-
-exports.insertuser = (req,res)=>{
-    let {nik,nama,alamat,email,tgllahir,tptlahir,kelurahan,kecamatan,kota,provinsi,password} = req.body
-    let gambarUser = []
-    req.files.forEach((data)=>{
-        gambarUser.push(data.path)
-    })
-    let dataSave = new Datauser({
-   nik : nik,
-   nama : nama, 
-   alamat : alamat,
-   email : email,
-   tgllahir : tgllahir,
-   tptlahir : tptlahir,
-   kelurahan : kelurahan,
-   kecamatan : kecamatan,
-   kota : kota,
-   provinsi : provinsi,
-   password : password,
-   gambarUser:gambarUser
-    })
-    dataSave.save().then((doc)=>{
-        res.status(200).json({
-            message:"Insert Berhasilasdasdasd!",
-            timestamp: req.requestTime,
-            data: doc
-        })
-    }).catch(err=>{
-        res.status(400).send("Gagal Insert Data ERR : "+err)
-    })
-}
 
 exports.getuser = (req,res)=>{
     Datauser.find().exec((err,doc)=>{
@@ -265,20 +237,40 @@ exports.getUserByNik = (req, res,next) => {
   };
 
   
-exports.getUserlogin = (req, res,next) => {
-    // let nik = req.params.nik;
-    let {nik,password} = req.body
-    Datauser.find({nik:{$regex:nik,$options:'i'}}).exec((err,doc)=>{
-      if(!err){
-          res.status(200).json({
-              message:"Berhasil mendapatkan buah dengan rasa "+nik,
-              data:doc
-          })
-      }
-      else{
-          res.status(400).send("Gagal mendapatkan buah" + err)
-      }
-  })
-  };
-  
-  
+// exports.getUserlogin = (req, res,next) => {
+//     // let nik = req.params.nik;
+//     let {nik,password} = req.body
+//     Datauser.find({nik:{$regex:nik,$options:'i'}}).exec((err,doc)=>{
+//       if(!err){
+//           res.status(200).json({
+//               message:"Berhasil mendapatkan buah dengan rasa "+nik,
+//               data:doc
+//           })
+//       }
+//       else{
+//           res.status(400).send("Gagal mendapatkan buah" + err)
+//       }
+//   })
+//   };
+// exports.registrasi = async(req,res)=>{
+//     const newuser=new Datauser(req.body);
+//    console.log(newuser);
+
+//    if(newuser.password!=newuser.password2)return res.status(400).json({message: "password not match"});
+   
+// //    Datauser.findOne({email:newuser.email},function(err,user){
+// //        if(user) return res.status(400).json({ auth : false, message :"email exits"});
+// let gambarUser = []
+// req.files.forEach((data)=>{
+//     gambarUser.push(data.path)
+// })
+//        newuser.save((err,doc)=>{
+//            if(err) {console.log(err);
+//                return res.status(400).json({ success : false});}
+//            res.status(200).json({
+//                succes:true,
+//                user : doc
+//            });
+//        });
+// //    });
+// }
